@@ -159,6 +159,10 @@ var Prompts = (function (_super) {
                             };
                             break;
                         case record.RecordingCompletionReason.callTerminated:
+                            response = {
+                                recordedAudio: results.recordedAudio,
+                                lengthOfRecordingInSecs: recordOutcome.lengthOfRecordingInSecs
+                            };
                             state = PromptResponseState.terminated;
                             break;
                         case record.RecordingCompletionReason.temporarySystemFailure:
@@ -201,6 +205,8 @@ var Prompts = (function (_super) {
                     }
                     break;
                 case PromptResponseState.terminated:
+                    // We first return the recording, and then end the conversation
+                    session.endDialogWithResult({ resumed: dlg.ResumeReason.completed, response: response });
                     session.endConversation();
                     break;
             }
